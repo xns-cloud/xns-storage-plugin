@@ -1,0 +1,14 @@
+{
+  "name": "xns-storage",
+  "displayName": "XNS Storage",
+  "version": "0.1.0",
+  "description": "Set up and run XNS S3-compatible object storage from a conversation: create an account, install the Relayer gateway, link it to your account, and verify storage. $6.00 per TB per month, $0 egress.",
+  "author": {
+    "name": "SCP Corp",
+    "url": "https://xns.tech"
+  },
+  "homepage": "https://xns.tech",
+  "repository": "https://github.com/xns-cloud/xns-storage-plugin",
+  "license": "Apache-2.0",
+  "keywords": ["storage", "s3", "object-storage", "backup", "zero-egress", "xns"]
+}

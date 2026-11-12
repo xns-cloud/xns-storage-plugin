@@ -1,0 +1,54 @@
+---
+name: set-up-xns-storage
+description: Use when the user wants S3-compatible object storage, zero-egress storage, a backup target, or asks to set up XNS or the XNS Relayer. Walks the full onboarding with the xns-relayer tools, from account sign-up to a verified bucket.
+---
+
+# Set up XNS storage
+
+XNS is S3-compatible object storage at $6.00 per TB per month with $0 egress. The user runs
+a small gateway, the **Relayer**, in Docker on a machine they control. The Relayer speaks S3
+locally and spreads the data across the XNS network of independent storage hosts.
+
+The xns-relayer tools do the work. The user only has to do three things in their own browser:
+create an account, click one email link and confirm one claim. Never ask the user for a
+password, and never type one for them.
+
+## Before you start
+
+Run `check_prerequisites` first and read every line of its result.
+
+- The machine needs Docker Engine with the compose plugin, Node.js 20 or newer, ports 8888,
+  9000 and 9443 free, and at least 10 GB of free disk.
+- On Ubuntu 24.04 or Debian 12 the user can install everything with one command:
+  `curl -fsSL https://releases.xns.tech/relayer/install.sh | sh`. Show it to them; let them
+  run it, then log out and back in so the `docker` group applies.
+- If the result says the environment is ephemeral (a sandbox, CI runner or throwaway VM),
+  tell the user the install would be lost and suggest a persistent machine.
+- If the Docker daemon is on another machine, the install has to run on that machine.
+
+## Onboarding, in order
+
+1. `start_registration`: give the user the sign-up link. They create the account in their browser.
+2. `check_email_verified`: poll while they click the verification link.
+3. `install_relayer`: installs the released Relayer and its monitoring. Fresh installs only.
+   If an `xns-relayer` container already exists, ask whether to keep it (skip to step 4) or
+   replace it (the user stops and removes the container; the data directory stays).
+4. `check_relayer_health`: wait until the dashboard and S3 are up.
+5. `start_claim`, then `check_claim_status`: give the user the claim link and wait while they
+   confirm it. This links the Relayer to their account.
+6. `get_host_tags`, then `configure_vpd`: let the user choose where their data lives (for
+   example by region or durability). Use `dry_run: true` first and show how many hosts match.
+7. `verify_storage`: a round trip of create bucket, upload and download.
+8. Optional: `setup_cli_credentials` writes S3 credentials to `~/.xns/credentials` so command
+   line tools work.
+
+After step 7, tell the user: the dashboard is at `http://<host>:8888`, and the S3 endpoint is
+`http://<host>:9000`.
+
+## When something fails
+
+Tool errors name the cause and the fix. Pass them on as written. The usual ones are a port
+already in use (`install_relayer` accepts `ui_port` and `s3_port`), Docker permission denied
+(add the user to the `docker` group and log in again), and Docker not running.
+
+Full troubleshooting: https://github.com/xns-cloud/relayer-mcp#troubleshooting
