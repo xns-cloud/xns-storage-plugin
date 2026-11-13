@@ -9,8 +9,8 @@ S3-compatible cloud object storage from XNS, set up and managed by your AI assis
 a small gateway, the **Relayer**, in Docker on a machine they control. The Relayer speaks S3
 locally and spreads the data across the XNS network of independent storage hosts.
 
-The XNS tools do the work. The user only has to do three things in their own browser:
-create an account, click one email link and confirm one claim. Never ask the user for a
+The XNS tools do the work. The user only has to do four things in their own browser:
+create an account, click one email link, confirm one claim and sign in to the Relayer dashboard. Never ask the user for a
 password, and never type one for them.
 
 ## If the XNS tools are not loaded
@@ -61,7 +61,8 @@ Run `check_prerequisites` first and read every line of its result.
    Relayer as awaiting its claim, because S3 starts only after the claim and the dashboard
    sign-in; go on to step 5. Step 7 needs S3 up.
 5. `start_claim`, then `check_claim_status`: give the user the claim link and wait while they
-   confirm it. This links the Relayer to their account.
+   confirm it. This links the Relayer to their account. Then have the user sign in to the
+   dashboard at `http://<host>:8888` with the same account: S3 starts only after that sign-in.
 6. `get_host_tags`, then `configure_vpd`: let the user choose where their data lives (for
    example by region or durability). Use `dry_run: true` first and show how many hosts match.
 7. `verify_storage`: a round trip of create bucket, upload and download.

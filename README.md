@@ -4,8 +4,8 @@ S3-compatible cloud object storage from XNS, set up and managed by your AI assis
 
 With this plugin, Claude can check your machine, help you create an [XNS](https://xns.tech)
 account, install the Relayer, link it to your account, let you choose where your data is
-stored, and confirm that storage works. Your part is three browser steps: sign up, click one
-email link and confirm one claim. Claude never sees your password.
+stored, and confirm that storage works. Your part is four browser steps: sign up, click one
+email link, confirm one claim and sign in to the Relayer dashboard. Claude never sees your password.
 
 ## Install
 
@@ -64,11 +64,12 @@ pins.
 - **Contacts** `auth.xns.tech` for sign-in (in your browser, with PKCE), `console.xns.tech`
   to claim your Relayer and to read or change its settings, `releases.xns.tech` to download
   the compose bundle and images, and Docker Hub for the `prom/node-exporter` image.
-- **Sends your sign-in token only to Relayers on your private network.** The tools that send it
+- **Sends your sign-in token to your Relayer.** The tools that send it
   to a host you name (`verify_storage`, `setup_cli_credentials`) accept only `localhost`,
   loopback, private (RFC 1918) addresses and `*.local`. `get_host_tags` and `configure_vpd` send
   it to the Relayer address set in the server, `http://localhost:8888` by default; the caller
-  cannot change it. Three inputs take any address: the host of the health
+  cannot change it, and those two follow a redirect the Relayer returns, where the other two
+  refuse one. Three inputs take any address: the host of the health
   check, the S3 endpoint of the storage test, and a custom compose file URL for install.
 - **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. The skills do not call
   it, because it needs a sign-in token that no tool hands back; create keys in the dashboard.
