@@ -9,6 +9,21 @@ A running Relayer serves S3 at `http://<host>:9000` (HTTPS on port 9443 when the
 set up a certificate) and its dashboard at `http://<host>:8888`. Any tool that speaks S3
 works with it once it has the endpoint and a key pair.
 
+## If the XNS tools are not loaded
+
+If the XNS tools are not available in this conversation, call no tool and skip every step that
+names a tool (credentials, settings, restarts and backups). Still give the endpoint settings for
+S3 tools from the lines below. If the person has no Relayer yet, say what XNS is and give the
+steps for a computer with Docker and Node.js 24: in Claude Code or Cowork on that computer,
+run `/plugin marketplace add xns-cloud/xns-storage-plugin`, then
+`/plugin install xns-storage@xns-cloud`, and say "set up XNS storage".
+
+Name the cause when you know it:
+
+- In claude.ai chat, the tools run only on a computer, so they cannot load here.
+- If the MCP server failed to start, run `/mcp` in Claude Code to see why.
+- If Node.js is missing, install Node.js 24 first, then restart Claude Code.
+
 ## Credentials
 
 - `setup_cli_credentials` creates an S3 key pair for the user's account and writes it to
