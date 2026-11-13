@@ -38,7 +38,7 @@ in Claude Code or Cowork.
 - Ports 8888, 9000 and 9443 free, and at least 10 GB of free disk
 
 On Ubuntu 24.04 or Debian 12, `curl -fsSL https://releases.xns.tech/relayer/install.sh | sh`
-installs Docker Engine and the compose plugin and starts a Relayer, which set-up keeps.
+installs Docker Engine and the compose plugin and starts a Relayer, which set-up offers to keep.
 
 ## What this plugin runs, sends and fetches
 
