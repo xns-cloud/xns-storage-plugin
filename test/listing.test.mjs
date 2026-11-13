@@ -221,7 +221,7 @@ describe('listing', () => {
       assert.ok(cause >= 0 && cause < steps, `${f}: the cause comes after the install steps`);
       for (const s of [
         'call no tool', 'skip every step that names a tool', ...COMMANDS, 'set up XNS storage', 'Docker',
-        'Node.js 24', 'claude.ai', 'failed to start', 'Node.js is missing',
+        'Node.js 24', 'claude.ai', 'failed to start', 'Node.js is missing', 'Do not repeat the install steps',
       ]) {
         assert.ok(body.includes(s), `${f}: section lacks "${s}"`);
       }
