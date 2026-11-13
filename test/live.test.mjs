@@ -36,18 +36,19 @@ const firstParagraph = (readme) => {
 };
 
 describe('live', () => {
-  test('TP-5 the pinned version is on npm and in the MCP registry', async () => {
-    const npm = execFileSync('npm', ['view', '@xns-cloud/relayer-mcp', 'version'], { encoding: 'utf8' }).trim();
+  test('the pinned version is on npm and in the MCP registry', async () => {
+    const npm = execFileSync('npm', ['view', `@xns-cloud/relayer-mcp@${PIN}`, 'version'], { encoding: 'utf8' }).trim();
     assert.equal(npm, PIN);
     const entry = await registryEntry();
     assert.ok(entry, `registry has no tech.xns/relayer ${PIN}`);
     assert.equal(entry.version, PIN);
   });
 
-  test('TP-7 README opening and manifest description hold the registry sentence and the price line', async () => {
+  test('README opening and manifest description hold the registry sentence and the price line', async () => {
     const entry = await registryEntry();
     assert.ok(entry);
     const sentence = entry.description;
+    assert.ok(sentence && sentence.length >= 20, `registry description too short: ${sentence}`);
     for (const [name, text] of [
       ['README', firstParagraph(read('README.md'))],
       ['manifest', json('.claude-plugin/plugin.json').description],
@@ -62,7 +63,7 @@ describe('live', () => {
     }
   });
 
-  test('TP-11 listing and README links answer 200 with no redirect', async () => {
+  test('listing and README links answer 200 with no redirect', async () => {
     const pj = json('.claude-plugin/plugin.json');
     const urls = new Set([pj.documentationUrl, pj.supportUrl, pj.privacyPolicyUrl, pj.termsOfServiceUrl]);
     for (const m of read('README.md').matchAll(/https:\/\/xns\.tech\/[^\s)>`]*/g)) urls.add(m[0].replace(/[.,;]+$/, ''));
@@ -71,10 +72,15 @@ describe('live', () => {
     for (const url of urls) {
       const res = await fetch(url, { redirect: 'manual' });
       assert.equal(res.status, 200, `${url} answered ${res.status}`);
+      const anchor = new URL(url).hash.slice(1);
+      if (anchor) {
+        const page = await res.text();
+        assert.ok(page.includes(`id="user-content-${anchor}"`) || page.includes(`id="${anchor}"`), `${url}: no #${anchor} on the page`);
+      }
     }
   });
 
-  test('TP-13 README names every image of the release compose and the Docker Hub source', async () => {
+  test('README names every image of the release compose and the Docker Hub source', async () => {
     const res = await fetch(COMPOSE);
     assert.equal(res.status, 200);
     const compose = await res.text();

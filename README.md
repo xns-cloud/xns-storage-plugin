@@ -39,6 +39,9 @@ in Claude Code or Cowork.
 
 On Ubuntu 24.04 or Debian 12, `curl -fsSL https://releases.xns.tech/relayer/install.sh | sh`
 installs Docker Engine and the compose plugin and starts a Relayer, which set-up offers to keep.
+When Claude Code is present, the script also installs Node.js 24 if needed and registers the
+same MCP server as `relayer`, at the floating `@latest` tag rather than the version this plugin
+pins.
 
 ## What this plugin runs, sends and fetches
 
@@ -58,8 +61,10 @@ installs Docker Engine and the compose plugin and starts a Relayer, which set-up
 - **Contacts** `auth.xns.tech` for sign-in (in your browser, with PKCE), `console.xns.tech`
   to claim your Relayer and to read or change its settings, `releases.xns.tech` to download
   the compose bundle and images, and Docker Hub for the `prom/node-exporter` image.
-- **Talks only to Relayers on your private network.** Tools that take a host accept only
-  `localhost`, loopback, private (RFC 1918) addresses and `*.local`.
+- **Sends your sign-in token only to Relayers on your private network.** The tools that send it
+  (`verify_storage`, `setup_cli_credentials`) accept only `localhost`, loopback, private
+  (RFC 1918) addresses and `*.local`. Three inputs take any address: the host of the health
+  check, the S3 endpoint of the storage test, and a custom compose file URL for install.
 - **Writes** `~/.xns/credentials` only when you ask Claude to set up command line credentials.
 - **Does not** collect telemetry, analytics or crash reports. Sign-in tokens stay in memory
   and are discarded when the server exits. Your stored objects never pass through the plugin.
