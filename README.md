@@ -22,6 +22,9 @@ In claude.ai chat the XNS tools cannot load, because they run only on a computer
 plugin explains XNS and gives these same steps to run on a computer with Docker and Node.js 24,
 in Claude Code or Cowork.
 
+In Cowork (the Claude desktop app), open the Plugins page, add the GitHub marketplace
+`xns-cloud/xns-storage-plugin` and install `xns-storage`.
+
 ## What's inside
 
 - **The XNS Relayer MCP server**
@@ -62,8 +65,10 @@ pins.
   to claim your Relayer and to read or change its settings, `releases.xns.tech` to download
   the compose bundle and images, and Docker Hub for the `prom/node-exporter` image.
 - **Sends your sign-in token only to Relayers on your private network.** The tools that send it
-  (`verify_storage`, `setup_cli_credentials`) accept only `localhost`, loopback, private
-  (RFC 1918) addresses and `*.local`. Three inputs take any address: the host of the health
+  to a host you name (`verify_storage`, `setup_cli_credentials`) accept only `localhost`,
+  loopback, private (RFC 1918) addresses and `*.local`. `get_host_tags` and `configure_vpd` send
+  it to the Relayer address set in the server, `http://localhost:8888` by default; the caller
+  cannot change it. Three inputs take any address: the host of the health
   check, the S3 endpoint of the storage test, and a custom compose file URL for install.
 - **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. The skills do not call
   it, because it needs a sign-in token that no tool hands back; create keys in the dashboard.

@@ -199,7 +199,8 @@ describe('listing', () => {
       assert.ok(readme.includes(h), h);
     }
     for (const s of [
-      'The tools that send it (`verify_storage`, `setup_cli_credentials`) accept only',
+      'The tools that send it to a host you name (`verify_storage`, `setup_cli_credentials`) accept only',
+      '`get_host_tags` and `configure_vpd` send it to the Relayer address set in the server',
       'Three inputs take any address',
       'only when `setup_cli_credentials` runs. The skills do not call it',
       '**Does not** collect telemetry, analytics or crash reports',

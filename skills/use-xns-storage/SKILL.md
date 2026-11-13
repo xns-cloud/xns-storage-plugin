@@ -21,9 +21,11 @@ S3 tools from the lines below. Name the cause when you know it:
 - In claude.ai chat, the tools run only on a computer, so they cannot load here.
 
 If the plugin is not installed yet and the person has no Relayer, say what XNS is and give the steps for a computer with Docker
-and Node.js 24: in Claude Code or Cowork on that computer, run
+and Node.js 24. In Claude Code on that computer, run
 `/plugin marketplace add xns-cloud/xns-storage-plugin`, then
-`/plugin install xns-storage@xns-cloud`, and say "set up XNS storage".
+`/plugin install xns-storage@xns-cloud`. In Cowork, add the GitHub marketplace
+`xns-cloud/xns-storage-plugin` on the Plugins page and install `xns-storage`. Then say "set up XNS
+storage".
 
 ## Credentials
 
