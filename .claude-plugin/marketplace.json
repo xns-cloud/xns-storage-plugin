@@ -1,0 +1,48 @@
+{
+  "name": "xns-cloud",
+  "owner": {
+    "name": "SCP Corp",
+    "url": "https://xns.tech"
+  },
+  "description": "S3-compatible cloud object storage from XNS, set up and managed by your AI assistant. $6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee. Use it as cloud storage for backups and developer tools; Claude takes you from sign-up to a verified bucket.",
+  "plugins": [
+    {
+      "name": "xns-storage",
+      "source": "./",
+      "description": "S3-compatible cloud object storage from XNS, set up and managed by your AI assistant. $6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee. Use it as cloud storage for backups and developer tools; Claude takes you from sign-up to a verified bucket.",
+      "category": "deployment",
+      "tags": [
+        "cloud-storage",
+        "object-storage",
+        "s3",
+        "backup",
+        "s3-compatible"
+      ],
+      "relevance": {
+        "topic": "S3-compatible cloud object storage",
+        "signals": {
+          "cli": [
+            "aws",
+            "rclone",
+            "restic",
+            "s5cmd"
+          ],
+          "manifestDeps": [
+            {
+              "file": "[/\\\\]requirements\\.txt$",
+              "pattern": "boto3"
+            },
+            {
+              "file": "[/\\\\]pyproject\\.toml$",
+              "pattern": "boto3"
+            },
+            {
+              "file": "[/\\\\]package\\.json$",
+              "pattern": "@aws-sdk/client-s3"
+            }
+          ]
+        }
+      }
+    }
+  ]
+}
