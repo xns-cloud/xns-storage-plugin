@@ -13,9 +13,9 @@
 - Both skills have a section for conversations where the XNS tools are not loaded (claude.ai chat,
   an MCP server that failed to start, Node.js missing). They call no tool and give the steps to run
   on a computer with Docker and Node.js 24.
-- The set-up skill asks before keeping or replacing an existing Relayer, installs only from the
-  release files unless the user supplies their own compose file, and never asks for a sign-in
-  token.
+- The set-up skill asks before keeping or replacing an existing Relayer and installs only from the
+  release files unless the user supplies their own compose file. Neither skill calls
+  `setup_cli_credentials` or asks for a sign-in token; keys come from the dashboard.
 - The README states which tools are limited to private addresses, matching the MCP server's
   privacy notes.
 - Node.js 24 is the stated minimum, matching the MCP server.

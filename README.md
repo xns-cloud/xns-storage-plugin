@@ -65,7 +65,8 @@ pins.
   (`verify_storage`, `setup_cli_credentials`) accept only `localhost`, loopback, private
   (RFC 1918) addresses and `*.local`. Three inputs take any address: the host of the health
   check, the S3 endpoint of the storage test, and a custom compose file URL for install.
-- **Writes** `~/.xns/credentials` only when you ask Claude to set up command line credentials.
+- **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. The skills do not call
+  it, because it needs a sign-in token that no tool hands back; create keys in the dashboard.
 - **Does not** collect telemetry, analytics or crash reports. Sign-in tokens stay in memory
   and are discarded when the server exits. Your stored objects never pass through the plugin.
 
