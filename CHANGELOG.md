@@ -9,8 +9,7 @@
 - The manifest description and the README opening lead with S3-compatible cloud object storage,
   carry the full price line, and describe the gateway on your machine as control and privacy.
 - The README lists every image the Relayer install pulls and where each comes from, the hosts the
-  plugin contacts, and the extra Relayer and `relayer` MCP registration that the host install
-  script adds, with the step to remove it.
+  plugin contacts, and the Relayer that the host install script starts.
 - Both skills have a section for conversations where the XNS tools are not loaded (claude.ai chat,
   an MCP server that failed to start, Node.js missing). They call no tool and give the steps to run
   on a computer with Docker and Node.js 24.

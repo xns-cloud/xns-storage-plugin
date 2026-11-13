@@ -40,10 +40,7 @@ Run `check_prerequisites` first and read every line of its result.
 - On Ubuntu 24.04 or Debian 12 the user can install everything with one command:
   `curl -fsSL https://releases.xns.tech/relayer/install.sh | sh`. Show it to them; let them
   run it, then log out and back in so the `docker` group applies. The script also starts a
-  Relayer in `/opt/xns-relayer` and, when Claude Code is present, it
-  registers the MCP as `relayer`, so step 3 below meets an existing container. That registration
-  loads the 15 tools a second time: remove it with `claude mcp remove relayer`. Until then, work with whichever
-  XNS tool set is loaded, and keep the Relayer the script started.
+  Relayer, so step 3 below meets an existing container: keep it.
 - If the result says the environment is ephemeral (a sandbox, CI runner or throwaway VM),
   tell the user the install would be lost and suggest a persistent machine.
 - If the Docker daemon is on another machine, the install has to run on that machine.

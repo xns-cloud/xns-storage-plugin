@@ -38,11 +38,7 @@ in Claude Code or Cowork.
 - Ports 8888, 9000 and 9443 free, and at least 10 GB of free disk
 
 On Ubuntu 24.04 or Debian 12, `curl -fsSL https://releases.xns.tech/relayer/install.sh | sh`
-installs Docker Engine and the compose plugin, starts a Relayer in `/opt/xns-relayer`, and,
-when Claude Code is present, installs Node.js 24 if needed and registers the MCP as `relayer`.
-If you ran the script and then install this plugin, that registration loads the 15 tools a
-second time. Remove it with `claude mcp remove relayer`. Until you do, the skills work with
-whichever XNS tool set is loaded, and set-up keeps the Relayer the script started.
+installs Docker Engine and the compose plugin and starts a Relayer, which set-up keeps.
 
 ## What this plugin runs, sends and fetches
 

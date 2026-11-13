@@ -223,14 +223,14 @@ describe('listing', () => {
     }
   });
 
-  test('TP-17 host install script: extra Relayer and registration, and the removal step', () => {
+  test('TP-17 host install script: states the Relayer it starts, no workaround steps', () => {
     const readme = flat(read('README.md'));
     const setUp = flat(read(SET_UP));
     for (const [name, text] of [['README', readme], [SET_UP, setUp]]) {
-      for (const s of ['claude mcp remove relayer', '/opt/xns-relayer', 'registers the MCP as `relayer`']) {
-        assert.ok(text.includes(s), `${name} lacks "${s}"`);
+      assert.match(text, /starts a Relayer/, `${name}: the script's Relayer not stated`);
+      for (const s of ['claude mcp remove', 'a second time']) {
+        assert.ok(!text.includes(s), `${name} holds "${s}"`);
       }
-      assert.match(text, /15 tools a second time/, `${name}: second load not stated`);
     }
     assert.ok(!readme.includes('installs the prerequisites'));
     for (const f of SKILLS) assert.ok(!read(f).includes('xns-relayer tools'), `${f} says "xns-relayer tools"`);
