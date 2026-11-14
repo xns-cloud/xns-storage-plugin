@@ -3,7 +3,7 @@
 // run the price and barred-word scans over more files.
 import { test, describe } from 'node:test';
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import { readFileSync, existsSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -15,8 +15,8 @@ const git = (...args) => execFileSync('git', ['-C', ROOT, ...args], { encoding: 
 const flat = (s) => s.replace(/\s+/g, ' ');
 
 const PRICE = '$6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee.';
-const SET_UP = 'skills/set-up-xns-storage/SKILL.md';
-const USE = 'skills/use-xns-storage/SKILL.md';
+const SET_UP = 'plugin/skills/set-up-xns-storage/SKILL.md';
+const USE = 'plugin/skills/use-xns-storage/SKILL.md';
 const SKILLS = [SET_UP, USE];
 const TOOLS = [
   'check_prerequisites', 'start_registration', 'check_email_verified', 'install_relayer',
@@ -25,6 +25,8 @@ const TOOLS = [
   'restart_service', 'manage_backups',
 ];
 const EXEMPT = ['ui_port', 's3_port', 'dry_run', 'require_restart', 'endpoint_url', 'compose_url'];
+const PLUGIN_JSON = 'plugin/.claude-plugin/plugin.json';
+const README = 'plugin/README.md';
 const COMMANDS = ['/plugin marketplace add xns-cloud/xns-storage-plugin', '/plugin install xns-storage@xns-cloud'];
 
 const extraFiles = () =>
@@ -58,15 +60,15 @@ const trackedText = () =>
 describe('listing', () => {
   test('marketplace name, single entry, install commands', () => {
     const mk = json('.claude-plugin/marketplace.json');
-    const pj = json('.claude-plugin/plugin.json');
+    const pj = json(PLUGIN_JSON);
     assert.equal(mk.name, 'xns-cloud');
     assert.equal(mk.plugins.length, 1);
     const entry = mk.plugins[0];
     assert.equal(entry.name, 'xns-storage');
     assert.equal(entry.name, pj.name);
-    assert.equal(entry.source, './');
+    assert.equal(entry.source, './plugin');
     assert.ok(!('version' in entry));
-    const readme = read('README.md');
+    const readme = read(README);
     const a = readme.indexOf(COMMANDS[0]);
     const b = readme.indexOf(COMMANDS[1]);
     assert.ok(a >= 0, 'first install command missing');
@@ -100,28 +102,28 @@ describe('listing', () => {
   });
 
   test('one pinned version in .mcp.json, README, manifest and changelog', () => {
-    const srv = json('.mcp.json').mcpServers['xns-relayer'];
+    const srv = json('plugin/.mcp.json').mcpServers['xns-relayer'];
     assert.equal(srv.command, 'npx');
     assert.equal(srv.args.length, 2);
     assert.equal(srv.args[0], '-y');
     const m = /^@xns-cloud\/relayer-mcp@(\d+\.\d+\.\d+)$/.exec(srv.args[1]);
     assert.ok(m, `pin must be three plain numbers: ${srv.args[1]}`);
-    const readme = read('README.md');
+    const readme = read(README);
     const found = [...readme.matchAll(/npx -y @xns-cloud\/relayer-mcp@(\S+?)`/g)].map((x) => x[1]);
     assert.ok(found.length >= 1);
     for (const v of found) assert.equal(v, m[1]);
-    assert.equal(json('.claude-plugin/plugin.json').version, '0.2.0');
+    assert.equal(json(PLUGIN_JSON).version, '0.3.0');
     const heading = read('CHANGELOG.md').split('\n').find((l) => l.startsWith('## ['));
-    assert.ok(heading.startsWith('## [0.2.0]'), heading);
+    assert.ok(heading.startsWith('## [0.3.0]'), heading);
   });
 
   test('every dollar amount sits inside the whole price line', () => {
     const files = [
-      'README.md', 'CHANGELOG.md', SET_UP, USE, '.claude-plugin/plugin.json',
-      '.claude-plugin/marketplace.json', '.mcp.json',
+      README, 'README.md', 'CHANGELOG.md', SET_UP, USE, PLUGIN_JSON,
+      '.claude-plugin/marketplace.json', 'plugin/.mcp.json',
     ].map((f) => [f, read(f)]);
     for (const f of extraFiles()) files.push([f, absRead(f)]);
-    for (const [f, text] of [['README.md', read('README.md')], [SET_UP, read(SET_UP)], ['plugin.json description', json('.claude-plugin/plugin.json').description]]) {
+    for (const [f, text] of [[README, read(README)], [SET_UP, read(SET_UP)], ['plugin.json description', json(PLUGIN_JSON).description]]) {
       assert.ok(flat(text).includes(PRICE), `${f}: price line missing`);
     }
     for (const [f, text] of files) {
@@ -150,17 +152,17 @@ describe('listing', () => {
   });
 
   test('listing links in the manifest', () => {
-    const pj = json('.claude-plugin/plugin.json');
-    assert.equal(pj.documentationUrl, 'https://github.com/xns-cloud/xns-storage-plugin/blob/main/README.md');
+    const pj = json(PLUGIN_JSON);
+    assert.equal(pj.documentationUrl, 'https://github.com/xns-cloud/xns-storage-plugin/blob/main/plugin/README.md');
     assert.equal(pj.supportUrl, 'https://github.com/xns-cloud/xns-storage-plugin/issues');
     assert.equal(pj.privacyPolicyUrl, 'https://xns.tech/privacy-policy');
     assert.equal(pj.termsOfServiceUrl, 'https://xns.tech/tos');
   });
 
   test('icon file: tracked, PNG or JPEG, square, 512 to 2048 px, under 2 MB', () => {
-    const icon = json('.claude-plugin/plugin.json').icon;
+    const icon = json(PLUGIN_JSON).icon;
     assert.ok(icon, 'manifest has no icon');
-    const rel = icon.replace(/^\.\//, '');
+    const rel = 'plugin/' + icon.replace(/^\.\//, '');
     git('ls-files', '--error-unmatch', '--', rel);
     const buf = readFileSync(path.join(ROOT, rel));
     assert.ok(buf.length < 2_000_000, `size ${buf.length}`);
@@ -190,9 +192,9 @@ describe('listing', () => {
   });
 
   test('privacy facts and help links', () => {
-    const readme = read('README.md');
+    const readme = read(README);
     assert.ok(readme.includes('https://github.com/xns-cloud/relayer-mcp/blob/main/PRIVACY.md'));
-    for (const f of ['README.md', SET_UP]) {
+    for (const f of [README, SET_UP]) {
       assert.ok(read(f).includes('https://github.com/xns-cloud/relayer-mcp#troubleshooting'), `${f}: troubleshooting link missing`);
     }
     for (const h of ['auth.xns.tech', 'console.xns.tech', 'releases.xns.tech', 'Docker Hub', '~/.xns/credentials']) {
@@ -232,20 +234,20 @@ describe('listing', () => {
     }
   });
 
-  test('host install script: states the Relayer it starts, no workaround steps', () => {
-    const readme = flat(read('README.md'));
+  test('set-up skill: keep-or-replace question, no install-script wording', () => {
+    const readme = flat(read(README));
     const setUp = flat(read(SET_UP));
     for (const [name, text] of [['README', readme], [SET_UP, setUp]]) {
-      assert.match(text, /starts a Relayer/, `${name}: the script's Relayer not stated`);
-      for (const s of ['claude mcp remove', 'a second time']) {
+      for (const s of ['claude mcp remove', 'a second time', 'install.sh', '@latest', 'registers the same MCP server']) {
         assert.ok(!text.includes(s), `${name} holds "${s}"`);
       }
+      for (const url of ['https://docs.docker.com/engine/install/', 'https://nodejs.org/en/download']) {
+        assert.ok(text.includes(url), `${name}: missing ${url}`);
+      }
     }
-    assert.ok(!readme.includes('installs the prerequisites'));
-    assert.match(readme, /registers the same MCP server as `relayer`, at the floating `@latest` tag/);
     // Every sentence about an existing Relayer asks; none keeps it on its own.
     const existing = sentences(setUp).filter((s) => /existing container|container already exists/.test(s));
-    assert.ok(existing.length >= 2, 'set-up skill does not mention the existing container');
+    assert.ok(existing.length >= 1, 'set-up skill does not mention the existing container');
     for (const s of existing) assert.match(s, /ask/, `keeps the Relayer without asking: ${s}`);
     assert.ok(!/:\s*keep it\b/i.test(setUp), 'set-up skill says "keep it" without asking');
     for (const f of SKILLS) assert.ok(!read(f).includes('xns-relayer tools'), `${f} says "xns-relayer tools"`);
@@ -316,11 +318,11 @@ describe('listing', () => {
   });
 
   test('skill folder names, name lines and README', () => {
-    const dirs = git('ls-files', 'skills').split('\n').filter(Boolean).map((f) => f.split('/')[1]);
+    const dirs = git('ls-files', 'plugin/skills').split('\n').filter(Boolean).map((f) => f.split('/')[2]);
     assert.deepEqual([...new Set(dirs)].sort(), ['set-up-xns-storage', 'use-xns-storage']);
-    const readme = read('README.md');
+    const readme = read(README);
     for (const f of SKILLS) {
-      const folder = f.split('/')[1];
+      const folder = f.split('/')[2];
       const name = /^name:\s*(.+)$/m.exec(read(f))[1].trim();
       assert.equal(name, folder);
       assert.ok(readme.includes(`\`${folder}\``), `${folder} not in README code span`);
@@ -328,7 +330,7 @@ describe('listing', () => {
   });
 
   test('the gateway reads as a benefit, never a requirement', () => {
-    const readme = read('README.md');
+    const readme = read(README);
     assert.ok(!readme.includes('You run a small gateway'));
     const para = firstParagraph(readme);
     const gw = sentences(para).filter((s) => /gateway/i.test(s));
@@ -336,7 +338,7 @@ describe('listing', () => {
       gw.some((s) => /control|privacy|private/i.test(s) && /where your data lives/i.test(s)),
       'no benefit sentence about the gateway',
     );
-    const desc = json('.claude-plugin/plugin.json').description;
+    const desc = json(PLUGIN_JSON).description;
     for (const text of [para, desc]) {
       for (const s of sentences(text)) {
         if (/gateway|relayer/i.test(s)) assert.ok(!/must|need to|have to|require/i.test(s), `requirement wording: ${s}`);
@@ -346,8 +348,53 @@ describe('listing', () => {
 
   test('both marketplace descriptions equal the manifest description', () => {
     const mk = json('.claude-plugin/marketplace.json');
-    const d = json('.claude-plugin/plugin.json').description;
+    const d = json(PLUGIN_JSON).description;
     assert.equal(mk.description, d);
     assert.equal(mk.plugins[0].description, d);
+  });
+
+  const ALLOWED_EXT = /\.(md|txt|json|ya?ml|png|jpe?g|gif|webp|ico)$/i;
+  const ALLOWED_NAMES = ['LICENSE'];
+  const pluginFiles = () =>
+    git('ls-files', '--cached', '--others', '--exclude-standard', '-z', 'plugin').split('\0').filter(Boolean);
+
+  test('every file under plugin/ has an allowed type, and no changelog', () => {
+    const files = pluginFiles();
+    assert.ok(files.length >= 6, `found ${files.length} files`);
+    for (const f of files) {
+      assert.ok(ALLOWED_EXT.test(f) || ALLOWED_NAMES.includes(path.basename(f)), `disallowed file type: ${f}`);
+      assert.ok(!/changelog/i.test(path.basename(f)), `changelog inside plugin/: ${f}`);
+    }
+  });
+
+  test('no download-and-run command under plugin/ or in the root README', () => {
+    const pipeToShell = /\b(curl|wget)\b[^\n]*\|\s*(sudo\s+)?(ba|z|da)?sh\b/i;
+    const files = [...pluginFiles().filter((f) => !/\.(png|jpe?g|gif|webp|ico)$/i.test(f)), 'README.md'];
+    for (const f of files) assert.ok(!pipeToShell.test(read(f)), `${f}: download-and-run command`);
+  });
+
+  test('plugin README has an Example prompts section with at least three items', () => {
+    const body = section(read(README), '## Example prompts');
+    const items = body.split('\n').filter((l) => /^\s*[-*]\s+\S/.test(l));
+    assert.ok(items.length >= 3, `found ${items.length} prompts`);
+  });
+
+  test('plugin README has the security contact', () => {
+    assert.ok(section(read(README), '## Security').includes('support@xns.tech'));
+  });
+
+  test('marketplace source is ./plugin and the manifest lives there', () => {
+    assert.equal(json('.claude-plugin/marketplace.json').plugins[0].source, './plugin');
+    assert.ok(existsSync(path.join(ROOT, PLUGIN_JSON)), 'plugin/.claude-plugin/plugin.json missing');
+    assert.ok(!existsSync(path.join(ROOT, '.claude-plugin/plugin.json')), 'stray root plugin.json');
+  });
+
+  test('skill frontmatter has only name and description', () => {
+    for (const f of SKILLS) {
+      const m = /^---\n([\s\S]*?)\n---\n/.exec(read(f));
+      assert.ok(m, `${f}: no frontmatter`);
+      const keys = m[1].split('\n').filter((l) => /^[A-Za-z][\w-]*:/.test(l)).map((l) => l.split(':')[0]);
+      assert.deepEqual(keys, ['name', 'description'], `${f}: frontmatter keys`);
+    }
   });
 });

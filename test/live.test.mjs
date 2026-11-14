@@ -11,8 +11,10 @@ const read = (p) => readFileSync(path.join(ROOT, p), 'utf8');
 const json = (p) => JSON.parse(read(p));
 const flat = (s) => s.replace(/\s+/g, ' ');
 
+const PLUGIN_JSON = 'plugin/.claude-plugin/plugin.json';
+const README = 'plugin/README.md';
 const PRICE = '$6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee.';
-const PIN = /@(\d+\.\d+\.\d+)$/.exec(json('.mcp.json').mcpServers['xns-relayer'].args[1])[1];
+const PIN = /@(\d+\.\d+\.\d+)$/.exec(json('plugin/.mcp.json').mcpServers['xns-relayer'].args[1])[1];
 const COMPOSE = 'https://releases.xns.tech/relayer/release/docker-compose.yml';
 
 const getJson = async (url) => {
@@ -50,8 +52,8 @@ describe('live', () => {
     const sentence = entry.description;
     assert.ok(sentence && sentence.length >= 20, `registry description too short: ${sentence}`);
     for (const [name, text] of [
-      ['README', firstParagraph(read('README.md'))],
-      ['manifest', json('.claude-plugin/plugin.json').description],
+      ['README', firstParagraph(read(README))],
+      ['manifest', json(PLUGIN_JSON).description],
     ]) {
       const t = flat(text);
       assert.ok(t.includes(sentence), `${name}: registry sentence missing`);
@@ -64,9 +66,9 @@ describe('live', () => {
   });
 
   test('listing and README links answer 200 with no redirect', async () => {
-    const pj = json('.claude-plugin/plugin.json');
+    const pj = json(PLUGIN_JSON);
     const urls = new Set([pj.documentationUrl, pj.supportUrl, pj.privacyPolicyUrl, pj.termsOfServiceUrl]);
-    for (const m of read('README.md').matchAll(/https:\/\/xns\.tech\/[^\s)>`]*/g)) urls.add(m[0].replace(/[.,;]+$/, ''));
+    for (const m of read(README).matchAll(/https:\/\/xns\.tech\/[^\s)>`]*/g)) urls.add(m[0].replace(/[.,;]+$/, ''));
     urls.add('https://github.com/xns-cloud/relayer-mcp#troubleshooting');
     urls.add('https://github.com/xns-cloud/relayer-mcp/blob/main/PRIVACY.md');
     for (const url of urls) {
@@ -86,7 +88,7 @@ describe('live', () => {
     const compose = await res.text();
     const repos = [...compose.matchAll(/^\s*image:\s*(\S+)/gm)].map((m) => m[1].replace(/:[^:/]+$/, ''));
     assert.ok(repos.length >= 8, `found ${repos.length} images`);
-    const readme = read('README.md');
+    const readme = read(README);
     const sec = readme.slice(readme.indexOf('## What this plugin runs, sends and fetches'));
     const body = sec.slice(0, sec.indexOf('\n## ', 5) < 0 ? undefined : sec.indexOf('\n## ', 5));
     for (const r of repos) assert.ok(body.includes(r), `README section lacks ${r}`);
