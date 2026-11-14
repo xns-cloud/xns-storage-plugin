@@ -1,6 +1,8 @@
 # XNS Storage plugin for Claude
 
-A Claude Code plugin and marketplace for XNS S3-compatible cloud object storage. The plugin
+A Claude Code plugin and marketplace for XNS S3-compatible cloud object storage.
+$6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee.
+The plugin
 lives in [`plugin/`](./plugin); its full documentation is in
 [plugin/README.md](./plugin/README.md).
 
