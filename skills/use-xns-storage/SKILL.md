@@ -9,12 +9,30 @@ A running Relayer serves S3 at `http://<host>:9000` (HTTPS on port 9443 when the
 set up a certificate) and its dashboard at `http://<host>:8888`. Any tool that speaks S3
 works with it once it has the endpoint and a key pair.
 
+## If the XNS tools are not loaded
+
+If the XNS tools are not available in this conversation, call no tool and skip every step that
+names a tool (credentials, settings, restarts and backups). Still give the endpoint settings for
+S3 tools from the lines below. Name the cause when you know it:
+
+- In Claude Code with this plugin installed, the MCP server failed to start: run `/mcp` to see
+  why, and check that `node --version` prints 24 or newer. Do not repeat the install steps.
+- If Node.js is missing, install Node.js 24 first, then restart Claude Code.
+- In claude.ai chat, the tools run only on a computer, so they cannot load here.
+
+If the plugin is not installed yet and the person has no Relayer, say what XNS is and give the steps for a computer with Docker
+and Node.js 24. In Claude Code on that computer, run
+`/plugin marketplace add xns-cloud/xns-storage-plugin`, then
+`/plugin install xns-storage@xns-cloud`. In Cowork, add the GitHub marketplace
+`xns-cloud/xns-storage-plugin` on the Plugins page and install `xns-storage`. Then say "set up XNS
+storage".
+
 ## Credentials
 
-- `setup_cli_credentials` creates an S3 key pair for the user's account and writes it to
-  `~/.xns/credentials`. Use that key pair in other S3 tools.
-- The user can also create keys in the dashboard, including a **Backup** key type made for
-  immutable backups.
+- The user creates S3 keys in the dashboard, including a **Backup** key type made for immutable
+  backups. Use that key pair in other S3 tools.
+- Do not call `setup_cli_credentials`: it needs the user's sign-in token, which no tool hands
+  back. Never ask the user to paste a sign-in token.
 - Never print a secret key back into the conversation unless the user asks for it.
 
 ## Pointing common tools at it

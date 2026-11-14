@@ -2,7 +2,7 @@
   "mcpServers": {
     "xns-relayer": {
       "command": "npx",
-      "args": ["-y", "@xns-cloud/relayer-mcp@0.12.3"]
+      "args": ["-y", "@xns-cloud/relayer-mcp@0.13.0"]
     }
   }
 }
