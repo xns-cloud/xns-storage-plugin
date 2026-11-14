@@ -39,11 +39,8 @@ Run `check_prerequisites` first and read every line of its result.
 
 - The machine needs Docker Engine with the compose plugin, Node.js 24 or newer, ports 8888,
   9000 and 9443 free, and at least 10 GB of free disk.
-- On Ubuntu 24.04 or Debian 12 the user can install Docker Engine and the compose plugin (and
-  Node.js 24, when Claude Code is present) with one command:
-  `curl -fsSL https://releases.xns.tech/relayer/install.sh | sh`. Show it to them; let them
-  run it, then log out and back in so the `docker` group applies. The script also starts a
-  Relayer, so step 3 below meets an existing container and asks whether to keep it.
+- If Docker Engine or Node.js is missing, point the user to the official install pages:
+  https://docs.docker.com/engine/install/ and https://nodejs.org/en/download.
 - If the result says the environment is ephemeral (a sandbox, CI runner or throwaway VM),
   tell the user the install would be lost and suggest a persistent machine.
 - If the Docker daemon is on another machine, the install has to run on that machine.

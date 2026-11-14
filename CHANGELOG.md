@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.3.0] - 2026-11-13
+
+### Changed
+
+- The plugin now lives in `plugin/`; the marketplace entry's source is `./plugin`. Tests,
+  the changelog and the marketplace file stay at the repository root.
+- The README and the set-up skill no longer give a download-and-run install command. They state
+  the requirements (Docker Engine with the compose plugin, Node.js 24) and link the Docker and
+  Node.js install pages. The set-up skill still asks whether to keep or replace an existing
+  Relayer.
+- `documentationUrl` points to `plugin/README.md`.
+
+### Added
+
+- README sections for example prompts and for reporting security issues.
+- Tests: allowed file types under `plugin/`, no download-and-run commands, example prompts,
+  security contact, marketplace source, and skill frontmatter keys.
+
 ## [0.2.0] - 2026-11-13
 
 ### Changed

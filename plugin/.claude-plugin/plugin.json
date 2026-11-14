@@ -1,7 +1,7 @@
 {
   "name": "xns-storage",
   "displayName": "XNS Storage",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "S3-compatible cloud object storage from XNS, set up and managed by your AI assistant. $6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee. Use it as cloud storage for backups and developer tools; Claude takes you from sign-up to a verified bucket.",
   "author": {
     "name": "SCP Corp",
@@ -11,7 +11,7 @@
   "repository": "https://github.com/xns-cloud/xns-storage-plugin",
   "license": "Apache-2.0",
   "icon": "./assets/icon.png",
-  "documentationUrl": "https://github.com/xns-cloud/xns-storage-plugin/blob/main/README.md",
+  "documentationUrl": "https://github.com/xns-cloud/xns-storage-plugin/blob/main/plugin/README.md",
   "supportUrl": "https://github.com/xns-cloud/xns-storage-plugin/issues",
   "privacyPolicyUrl": "https://xns.tech/privacy-policy",
   "termsOfServiceUrl": "https://xns.tech/tos",

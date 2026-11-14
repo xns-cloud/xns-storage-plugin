@@ -8,7 +8,7 @@
   "plugins": [
     {
       "name": "xns-storage",
-      "source": "./",
+      "source": "./plugin",
       "description": "S3-compatible cloud object storage from XNS, set up and managed by your AI assistant. $6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee. Use it as cloud storage for backups and developer tools; Claude takes you from sign-up to a verified bucket.",
       "category": "deployment",
       "tags": [
