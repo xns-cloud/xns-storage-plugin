@@ -208,7 +208,7 @@ describe('listing', () => {
       '`verify_storage` sends the server\'s sign-in only to that same address',
       'a token you pass to it yourself goes to the Relayer address you pass, which must be',
       '`verify_storage` and `setup_cli_credentials` refuse a redirect the Relayer returns; the other tools follow one',
-      'first ask you whether that file holds profiles you want to keep',
+      'first ask you whether that file holds profiles you want to keep; they call it only when you say to replace the file',
       'Two inputs take any address, and neither gets the token',
       'A custom compose file URL for install is taken only from https on `releases.xns.tech`',
       'only when `setup_cli_credentials` runs. It uses the server\'s own sign-in',
@@ -290,6 +290,7 @@ describe('listing', () => {
       assert.ok(!text.includes('no tool hands back'), `${f}: keeps the "no tool hands back" line`);
       assert.ok(naming.some((s) => s.includes("the server's own sign-in")), `${f}: does not say setup_cli_credentials uses the server's own sign-in`);
       assert.ok(text.includes('before calling it ask the user whether that file already holds profiles they want to keep'), `${f}: does not ask before replacing ~/.xns/credentials`);
+      assert.ok(text.includes('Call it only when the user says to replace the file; if they want to keep a profile, do not call it.'), `${f}: does not stop when the user keeps a profile`);
       const gated = flat(section(read(f), '## If the XNS tools are not loaded'));
       assert.ok(gated.indexOf(COMMANDS[0]) > gated.search(/plugin is not installed yet/), `${f}: install steps not gated on the plugin being absent`);
       assert.ok(/plugin is not installed yet/.test(gated), `${f}: install steps not gated on the plugin being absent`);

@@ -35,7 +35,8 @@ storage".
   `setup_cli_credentials` makes an S3 key pair with the server's own sign-in and writes
   `~/.xns/credentials`. It never takes a pasted token. It replaces `~/.xns/credentials` with one
   profile, so before calling it ask the user whether that file already holds
-  profiles they want to keep. Never ask the user to
+  profiles they want to keep. Call it only when the user says to replace the file; if they
+  want to keep a profile, do not call it. Never ask the user to
   paste a sign-in token.
 - Never print a secret key back into the conversation unless the user asks for it.
 

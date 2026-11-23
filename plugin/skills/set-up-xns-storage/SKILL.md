@@ -67,7 +67,8 @@ Run `check_prerequisites` first and read every line of its result.
    `setup_cli_credentials` makes an S3 key pair with the server's own sign-in and writes
    `~/.xns/credentials`. It never takes a pasted token. It replaces `~/.xns/credentials` with one
    profile, so before calling it ask the user whether that file already holds
-   profiles they want to keep. The user can also
+   profiles they want to keep. Call it only when the user says to replace the file; if they
+   want to keep a profile, do not call it. The user can also
    create a key pair in the dashboard. Never ask the user to paste a sign-in token.
 
 After step 7, tell the user: the dashboard is at `http://<host>:8888`, and the S3 endpoint is

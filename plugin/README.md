@@ -87,7 +87,8 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
   own sign-in (you never pass it a token), creates an S3 key pair named `xns-cli` on your
   Relayer, and replaces the whole file with a single `default` profile, so any other profile in
   it is lost. The skills offer it as an optional step once the claim is complete, and first ask
-  you whether that file holds profiles you want to keep.
+  you whether that file holds profiles you want to keep; they call it only when you say to
+  replace the file.
 - **Does not** collect telemetry, analytics or crash reports. The default compose download asks
   for `docker-compose.yml?src=mcp`: `src=mcp` is a fixed source tag, the same for every user
   and carrying no identifier, used only to count downloads by how they were made. The `.env`
