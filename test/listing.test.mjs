@@ -27,7 +27,7 @@ const TOOLS = [
 const EXEMPT = ['ui_port', 's3_port', 'dry_run', 'require_restart', 'endpoint_url', 'compose_url'];
 const PLUGIN_JSON = 'plugin/.claude-plugin/plugin.json';
 const README = 'plugin/README.md';
-const RELAYER_MCP_VERSION = '0.14.2';
+const RELAYER_MCP_VERSION = '0.14.3';
 const CONNECTOR_JSON = 'connector/.claude-plugin/plugin.json';
 const CONNECTOR_README = 'connector/README.md';
 const MCP = 'connector/.mcp.json';
@@ -236,6 +236,7 @@ describe('listing', () => {
       'Two inputs take any address, and neither gets the token',
       'A custom compose file URL for install is taken only from https on `releases.xns.tech`',
       'only when `setup_cli_credentials` runs. It uses the server\'s own sign-in',
+      'that can read, write and delete in every bucket',
       'adds the keys to the file as one profile. A profile that holds a secret key is never replaced',
       'A file that is not an XNS credentials file is left as it is',
       '`docker-compose.yml?src=mcp`',
@@ -317,7 +318,7 @@ describe('listing', () => {
       }
       assert.ok(!text.includes('no tool hands back'), `${f}: keeps the "no tool hands back" line`);
       assert.ok(naming.some((s) => s.includes("the server's own sign-in")), `${f}: does not say setup_cli_credentials uses the server's own sign-in`);
-      // relayer-mcp 0.14.2 keeps every profile that holds keys.
+      // relayer-mcp 0.14.3 keeps every profile that holds keys.
       assert.ok(text.includes('Profiles that hold keys are kept: when `default` already holds keys, the new ones go in a new profile.'), `${f}: does not say profiles are kept`);
       assert.ok(text.includes('Give the user the `xns` command from the reply.'), `${f}: does not pass on the xns command`);
       assert.ok(!/replaces `~\/\.xns\/credentials`|replace the file/.test(text), `${f}: still says the file is replaced`);

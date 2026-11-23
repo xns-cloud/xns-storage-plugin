@@ -33,7 +33,7 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
 
 ## What this connector runs, sends and fetches
 
-- **Runs** the MCP server with `npx -y @xns-cloud/relayer-mcp@0.14.2`, which downloads that
+- **Runs** the MCP server with `npx -y @xns-cloud/relayer-mcp@0.14.3`, which downloads that
   exact version from the npm registry.
 - **Starts Docker containers** on your machine when you ask Claude to install the Relayer. It
   writes `docker-compose.yml` and `.env` to the install directory. The release compose pulls
@@ -64,7 +64,8 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
   private-network or `.local` host.
 - **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. It uses the server's
   own sign-in (you never pass it a token), creates an S3 key pair named `xns-cli` on your
-  Relayer, and adds the keys to the file as one profile. A profile that holds a secret key is never
+  Relayer that can read, write and delete in every bucket, and adds the keys to the file as one
+  profile. A profile that holds a secret key is never
   replaced: the new keys go in `default` only when it is absent or holds no secret key, and
   otherwise in a new profile (`xns-cli`, then `xns-cli-2`). A file that is not an XNS credentials
   file is left as it is. The `xns-storage` skills offer it as an optional step once the claim is

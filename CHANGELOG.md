@@ -15,9 +15,10 @@
 - Upgrading from 0.3.x: after `xns-storage` updates, the XNS tools are gone until
   `xns-relayer` is installed. They then load under the new plugin's name, so tool permissions
   saved for the old names have to be granted again.
-- The connector starts `@xns-cloud/relayer-mcp@0.14.2`, where `setup_cli_credentials` keeps every
-  profile in `~/.xns/credentials` that holds keys. The skills no longer ask whether to replace the
-  file, and give the user the `xns` command from the reply.
+- The connector starts `@xns-cloud/relayer-mcp@0.14.3`, where `setup_cli_credentials` keeps every
+  profile in `~/.xns/credentials` that holds keys and gives the new key its permissions: read,
+  write and delete in every bucket. The skills no longer ask whether to replace the file, and give
+  the user the `xns` command from the reply.
 
 ### Fixed
 
