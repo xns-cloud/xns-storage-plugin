@@ -67,8 +67,10 @@ describe('live', () => {
   });
 
   test('listing and README links answer 200 with no redirect', async () => {
-    const pj = json(PLUGIN_JSON);
-    const urls = new Set([pj.documentationUrl, pj.supportUrl, pj.privacyPolicyUrl, pj.termsOfServiceUrl]);
+    const urls = new Set();
+    for (const pj of [json(PLUGIN_JSON), json('connector/.claude-plugin/plugin.json')]) {
+      for (const u of [pj.documentationUrl, pj.supportUrl, pj.privacyPolicyUrl, pj.termsOfServiceUrl]) urls.add(u);
+    }
     for (const f of [README, CONNECTOR_README]) {
       for (const m of read(f).matchAll(/https:\/\/xns\.tech\/[^\s)>`]*/g)) urls.add(m[0].replace(/[.,;]+$/, ''));
     }

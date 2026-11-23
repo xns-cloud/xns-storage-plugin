@@ -20,8 +20,9 @@ names a tool. Say what XNS is, using the paragraph above, then name the cause wh
 before anything else:
 
 - The tools come from the XNS Relayer connector (`xns-relayer`), a separate plugin that runs on
-  the computer. This plugin holds only these instructions. When `/mcp` lists no `xns-relayer`
-  server, the connector is not installed: give the install steps below.
+  the computer. This plugin holds only these instructions. The connector is not installed when
+  `/mcp` in Claude Code lists no `xns-relayer` server, or when the Cowork Plugins page does not
+  show `xns-relayer` as installed: give the install steps below.
 - In Claude Code with the connector installed (`/mcp` lists `xns-relayer`), its MCP server
   failed to start: run `/mcp` to see
   why, and check that `node --version` prints 24 or newer. Do not repeat the install steps.

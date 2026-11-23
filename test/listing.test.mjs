@@ -268,6 +268,8 @@ describe('listing', () => {
         'call no tool', 'skip every step that names a tool', ...COMMANDS, 'set up XNS storage', 'Docker',
         'Node.js 24', 'claude.ai', 'failed to start', 'Node.js is missing', 'Do not repeat the install steps',
         '`xns-relayer`', 'already installed from the Claude plugin directory',
+        'The connector is not installed when `/mcp` in Claude Code lists no `xns-relayer` server',
+        'Cowork Plugins page does not show `xns-relayer` as installed',
       ]) {
         assert.ok(body.includes(s), `${f}: section lacks "${s}"`);
       }
