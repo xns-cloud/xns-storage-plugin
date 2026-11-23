@@ -70,16 +70,25 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
 - **Contacts** `auth.xns.tech` for sign-in (in your browser, with PKCE), `console.xns.tech`
   to claim your Relayer and to read or change its settings, `releases.xns.tech` to download
   the compose bundle and images, and Docker Hub for the `prom/node-exporter` image.
-- **Sends your sign-in token to your Relayer.** The tools that send it
-  to a host you name (`verify_storage`, `setup_cli_credentials`) accept only `localhost`,
-  loopback, private (RFC 1918) addresses and `*.local`. `get_host_tags` and `configure_vpd` send
-  it to the Relayer address set in the server, `http://localhost:8888` by default; the caller
-  cannot change it, and those two follow a redirect the Relayer returns, where the other two
-  refuse one. Three inputs take any address: the host of the health
-  check, the S3 endpoint of the storage test, and a custom compose file URL for install.
-- **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. The skills do not call
-  it, because it needs a sign-in token that no tool hands back; create keys in the dashboard.
-- **Does not** collect telemetry, analytics or crash reports. Sign-in tokens stay in memory
+- **Sends your sign-in token to your Relayer.** `verify_storage` sends it to the Relayer
+  address you pass and accepts only `localhost`, loopback, private (RFC 1918) addresses and
+  `*.local`. `get_host_tags`, `configure_vpd` and `setup_cli_credentials` send it to the Relayer
+  address set in the server, `http://localhost:8888` by default; the caller cannot change the
+  host (`setup_cli_credentials` lets you pick only the port). `get_host_tags` and
+  `configure_vpd` follow a redirect the Relayer returns, where `verify_storage` and
+  `setup_cli_credentials` refuse one. Two inputs take any address, and neither gets the token:
+  the host of the health check and the S3 endpoint of the storage test. A custom compose file
+  URL for install is taken only from https on `releases.xns.tech`, a `file://` path to a `.yml`
+  or `.yaml` file, or a loopback, private-network or `.local` host.
+- **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. It uses the server's
+  own sign-in (you never pass it a token), creates an S3 key pair named `xns-cli` on your
+  Relayer, and replaces the whole file with a single `default` profile, so any other profile in
+  it is lost. The skills offer it as an optional step once the claim is complete, and ask you
+  first when that file already exists.
+- **Does not** collect telemetry, analytics or crash reports. The default compose download asks
+  for `docker-compose.yml?src=mcp`: `src=mcp` is a fixed source tag, the same for every user
+  and carrying no identifier, used only to count downloads by how they were made. The `.env`
+  download and a compose file URL you pass carry no tag. Sign-in tokens stay in memory
   and are discarded when the server exits. Your stored objects never pass through the plugin.
 
 ## Privacy policy

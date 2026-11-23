@@ -33,8 +33,9 @@ storage".
   backups. Use that key pair in other S3 tools.
 - Optional, for the XNS command line: once `check_claim_status` reaches STATE_3,
   `setup_cli_credentials` makes an S3 key pair with the server's own sign-in and writes
-  `~/.xns/credentials`. It never takes a pasted token. Never ask the user to paste a sign-in
-  token.
+  `~/.xns/credentials`. It never takes a pasted token. It replaces `~/.xns/credentials` with one
+  profile, so if that file already exists, ask the user before calling it. Never ask the user to
+  paste a sign-in token.
 - Never print a secret key back into the conversation unless the user asks for it.
 
 ## Pointing common tools at it

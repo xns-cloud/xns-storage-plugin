@@ -12,6 +12,13 @@
 - Both skills now offer `setup_cli_credentials` as an optional step: once the claim reaches
   STATE_3 it makes an S3 key pair and writes `~/.xns/credentials`. The skills still never ask the
   user to paste a sign-in token.
+- The README's "What this plugin runs, sends and fetches" section now matches relayer-mcp 0.14.1:
+  `setup_cli_credentials` uses the server's own sign-in and sends the token only to the server's
+  own Relayer address, a custom compose file URL is limited to `releases.xns.tech`, a `file://`
+  path or a local-network host, and the default compose download carries `?src=mcp`, a fixed
+  source tag with no identifier. Because the tool replaces `~/.xns/credentials` with a single
+  profile, the README says so and both skills ask the user before calling it when that file
+  already exists.
 
 ## [0.3.0] - 2026-11-13
 

@@ -204,14 +204,23 @@ describe('listing', () => {
       assert.ok(readme.includes(h), h);
     }
     for (const s of [
-      'The tools that send it to a host you name (`verify_storage`, `setup_cli_credentials`) accept only',
-      '`get_host_tags` and `configure_vpd` send it to the Relayer address set in the server',
-      'Three inputs take any address',
-      'only when `setup_cli_credentials` runs. The skills do not call it',
+      '`verify_storage` sends it to the Relayer address you pass and accepts only',
+      '`get_host_tags`, `configure_vpd` and `setup_cli_credentials` send it to the Relayer address set in the server',
+      'Two inputs take any address, and neither gets the token',
+      'A custom compose file URL for install is taken only from https on `releases.xns.tech`',
+      'only when `setup_cli_credentials` runs. It uses the server\'s own sign-in',
+      'replaces the whole file with a single `default` profile',
+      '`docker-compose.yml?src=mcp`',
+      'carrying no identifier',
       '**Does not** collect telemetry, analytics or crash reports',
       'Sign-in tokens stay in memory',
     ]) {
       assert.ok(flat(readme).includes(s), s);
+    }
+    // relayer-mcp 0.14.0 dropped these: setup_cli_credentials takes no token and no host,
+    // and compose_url no longer takes any address.
+    for (const s of ['Three inputs take any address', 'no tool hands back', 'The skills do not call it']) {
+      assert.ok(!flat(readme).includes(s), `README still says "${s}"`);
     }
   });
 

@@ -65,8 +65,9 @@ Run `check_prerequisites` first and read every line of its result.
 7. `verify_storage`: a round trip of create bucket, upload and download.
 8. Optional, for command line tools: once `check_claim_status` reaches STATE_3,
    `setup_cli_credentials` makes an S3 key pair with the server's own sign-in and writes
-   `~/.xns/credentials`. It never takes a pasted token. The user can also create a key pair in
-   the dashboard. Never ask the user to paste a sign-in token.
+   `~/.xns/credentials`. It never takes a pasted token. It replaces `~/.xns/credentials` with one
+   profile, so if that file already exists, ask the user before calling it. The user can also
+   create a key pair in the dashboard. Never ask the user to paste a sign-in token.
 
 After step 7, tell the user: the dashboard is at `http://<host>:8888`, and the S3 endpoint is
 `http://<host>:9000`.
