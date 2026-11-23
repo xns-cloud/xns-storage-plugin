@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.3.1] - 2026-11-23
+
+### Changed
+
+- The plugin starts `@xns-cloud/relayer-mcp@0.14.1` (was 0.13.0). That brings relayer-mcp
+  0.14.0's changes: `setup_cli_credentials` signs in with the server's own credentials instead of
+  taking a sign-in token, and `install_relayer` takes a `compose_url` only from
+  `releases.xns.tech`, a `file://` path or a local-network host. 0.14.1 adds `?src=mcp` to the
+  default compose download.
+- Both skills now offer `setup_cli_credentials` as an optional step: once the claim reaches
+  STATE_3 it makes an S3 key pair and writes `~/.xns/credentials`. The skills still never ask the
+  user to paste a sign-in token.
+
 ## [0.3.0] - 2026-11-13
 
 ### Changed
