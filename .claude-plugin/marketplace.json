@@ -43,6 +43,17 @@
           ]
         }
       }
+    },
+    {
+      "name": "xns-relayer",
+      "source": "./connector",
+      "description": "The connector for XNS Storage: the XNS Relayer MCP server, with 15 tools that install, link, check and manage the Relayer on your computer. Install it together with the xns-storage plugin, which carries the set-up and day-to-day skills.",
+      "category": "deployment",
+      "tags": [
+        "object-storage",
+        "s3",
+        "mcp"
+      ]
     }
   ]
 }

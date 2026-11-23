@@ -14,7 +14,8 @@ const flat = (s) => s.replace(/\s+/g, ' ');
 const PLUGIN_JSON = 'plugin/.claude-plugin/plugin.json';
 const README = 'plugin/README.md';
 const PRICE = '$6.00 per TB per month. $0 egress, uncapped. 30-day minimum retention, no early-delete fee.';
-const PIN = /@(\d+\.\d+\.\d+)$/.exec(json('plugin/.mcp.json').mcpServers['xns-relayer'].args[1])[1];
+const CONNECTOR_README = 'connector/README.md';
+const PIN = /@(\d+\.\d+\.\d+)$/.exec(json('connector/.mcp.json').mcpServers['xns-relayer'].args[1])[1];
 const COMPOSE = 'https://releases.xns.tech/relayer/release/docker-compose.yml';
 
 const getJson = async (url) => {
@@ -68,10 +69,14 @@ describe('live', () => {
   test('listing and README links answer 200 with no redirect', async () => {
     const pj = json(PLUGIN_JSON);
     const urls = new Set([pj.documentationUrl, pj.supportUrl, pj.privacyPolicyUrl, pj.termsOfServiceUrl]);
-    for (const m of read(README).matchAll(/https:\/\/xns\.tech\/[^\s)>`]*/g)) urls.add(m[0].replace(/[.,;]+$/, ''));
+    for (const f of [README, CONNECTOR_README]) {
+      for (const m of read(f).matchAll(/https:\/\/xns\.tech\/[^\s)>`]*/g)) urls.add(m[0].replace(/[.,;]+$/, ''));
+    }
     urls.add('https://github.com/xns-cloud/relayer-mcp#troubleshooting');
     urls.add('https://github.com/xns-cloud/relayer-mcp/blob/main/PRIVACY.md');
     for (const url of urls) {
+      // xns.tech limits automated clients: one request at a time, at least 3 seconds apart.
+      if (new URL(url).hostname === 'xns.tech') await new Promise((r) => setTimeout(r, 3000));
       const res = await fetch(url, { redirect: 'manual' });
       assert.equal(res.status, 200, `${url} answered ${res.status}`);
       const anchor = new URL(url).hash.slice(1);
@@ -82,14 +87,16 @@ describe('live', () => {
     }
   });
 
-  test('README names every image of the release compose and the Docker Hub source', async () => {
+  test('connector README names every image of the release compose and the Docker Hub source', async () => {
     const res = await fetch(COMPOSE);
     assert.equal(res.status, 200);
     const compose = await res.text();
     const repos = [...compose.matchAll(/^\s*image:\s*(\S+)/gm)].map((m) => m[1].replace(/:[^:/]+$/, ''));
     assert.ok(repos.length >= 8, `found ${repos.length} images`);
-    const readme = read(README);
-    const sec = readme.slice(readme.indexOf('## What this plugin runs, sends and fetches'));
+    const readme = read(CONNECTOR_README);
+    const at = readme.indexOf('## What this connector runs, sends and fetches');
+    assert.ok(at >= 0, 'connector README section missing');
+    const sec = readme.slice(at);
     const body = sec.slice(0, sec.indexOf('\n## ', 5) < 0 ? undefined : sec.indexOf('\n## ', 5));
     for (const r of repos) assert.ok(body.includes(r), `README section lacks ${r}`);
     const node = body.split('\n').find((l) => l.includes('prom/node-exporter'));

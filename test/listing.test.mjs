@@ -28,7 +28,24 @@ const EXEMPT = ['ui_port', 's3_port', 'dry_run', 'require_restart', 'endpoint_ur
 const PLUGIN_JSON = 'plugin/.claude-plugin/plugin.json';
 const README = 'plugin/README.md';
 const RELAYER_MCP_VERSION = '0.14.1';
-const COMMANDS = ['/plugin marketplace add xns-cloud/xns-storage-plugin', '/plugin install xns-storage@xns-cloud'];
+const CONNECTOR_JSON = 'connector/.claude-plugin/plugin.json';
+const CONNECTOR_README = 'connector/README.md';
+const MCP = 'connector/.mcp.json';
+const VERSION = '0.4.0';
+const COMMANDS = [
+  '/plugin marketplace add xns-cloud/xns-storage-plugin',
+  '/plugin install xns-storage@xns-cloud',
+  '/plugin install xns-relayer@xns-cloud',
+];
+const inOrder = (text, list) => {
+  let at = -1;
+  for (const c of list) {
+    const i = text.indexOf(c, at + 1);
+    if (i < 0) return false;
+    at = i;
+  }
+  return true;
+};
 
 const extraFiles = () =>
   (process.env.EXTRA_FILES ?? '').split(new RegExp(`[\\n${path.delimiter}]`)).map((s) => s.trim()).filter(Boolean);
@@ -59,21 +76,20 @@ const trackedText = () =>
     .filter((f) => f && !f.startsWith('test/') && !/\.(png|jpe?g)$/i.test(f));
 
 describe('listing', () => {
-  test('marketplace name, single entry, install commands', () => {
+  test('marketplace name, two entries, install commands', () => {
     const mk = json('.claude-plugin/marketplace.json');
-    const pj = json(PLUGIN_JSON);
     assert.equal(mk.name, 'xns-cloud');
-    assert.equal(mk.plugins.length, 1);
-    const entry = mk.plugins[0];
-    assert.equal(entry.name, 'xns-storage');
-    assert.equal(entry.name, pj.name);
-    assert.equal(entry.source, './plugin');
-    assert.ok(!('version' in entry));
-    const readme = read(README);
-    const a = readme.indexOf(COMMANDS[0]);
-    const b = readme.indexOf(COMMANDS[1]);
-    assert.ok(a >= 0, 'first install command missing');
-    assert.ok(b > a, 'second install command missing or out of order');
+    assert.equal(mk.plugins.length, 2);
+    const [skills, connector] = mk.plugins;
+    assert.equal(skills.name, 'xns-storage');
+    assert.equal(skills.name, json(PLUGIN_JSON).name);
+    assert.equal(connector.name, 'xns-relayer');
+    assert.equal(connector.name, json(CONNECTOR_JSON).name);
+    for (const e of mk.plugins) assert.ok(!('version' in e), `${e.name}: version in marketplace entry`);
+    for (const f of [README, CONNECTOR_README, 'README.md']) {
+      assert.ok(inOrder(read(f), COMMANDS), `${f}: install commands missing or out of order`);
+      assert.ok(flat(read(f)).includes('from the Claude plugin directory, skip the second command'), `${f}: no directory note`);
+    }
   });
 
   test('category, tags and relevance block', () => {
@@ -103,7 +119,8 @@ describe('listing', () => {
   });
 
   test('one pinned version in .mcp.json, README, manifest and changelog', () => {
-    const srv = json('plugin/.mcp.json').mcpServers['xns-relayer'];
+    assert.deepEqual(Object.keys(json(MCP).mcpServers), ['xns-relayer']);
+    const srv = json(MCP).mcpServers['xns-relayer'];
     assert.equal(srv.command, 'npx');
     assert.equal(srv.args.length, 2);
     assert.equal(srv.args[0], '-y');
@@ -111,19 +128,20 @@ describe('listing', () => {
     assert.ok(m, `pin must be three plain numbers: ${srv.args[1]}`);
     // The relayer-mcp release this plugin version ships with.
     assert.equal(m[1], RELAYER_MCP_VERSION);
-    const readme = read(README);
+    const readme = read(CONNECTOR_README);
     const found = [...readme.matchAll(/npx -y @xns-cloud\/relayer-mcp@(\S+?)`/g)].map((x) => x[1]);
     assert.ok(found.length >= 1);
     for (const v of found) assert.equal(v, m[1]);
-    assert.equal(json(PLUGIN_JSON).version, '0.3.1');
+    assert.equal(json(PLUGIN_JSON).version, VERSION);
+    assert.equal(json(CONNECTOR_JSON).version, VERSION);
     const heading = read('CHANGELOG.md').split('\n').find((l) => l.startsWith('## ['));
-    assert.ok(heading.startsWith('## [0.3.1]'), heading);
+    assert.ok(heading.startsWith(`## [${VERSION}]`), heading);
   });
 
   test('every dollar amount sits inside the whole price line', () => {
     const files = [
       README, 'README.md', 'CHANGELOG.md', SET_UP, USE, PLUGIN_JSON,
-      '.claude-plugin/marketplace.json', 'plugin/.mcp.json',
+      '.claude-plugin/marketplace.json', MCP, CONNECTOR_README, CONNECTOR_JSON,
     ].map((f) => [f, read(f)]);
     for (const f of extraFiles()) files.push([f, absRead(f)]);
     for (const [f, text] of [[README, read(README)], [SET_UP, read(SET_UP)], ['plugin.json description', json(PLUGIN_JSON).description]]) {
@@ -195,9 +213,12 @@ describe('listing', () => {
   });
 
   test('privacy facts and help links', () => {
-    const readme = read(README);
-    assert.ok(readme.includes('https://github.com/xns-cloud/relayer-mcp/blob/main/PRIVACY.md'));
-    for (const f of [README, SET_UP]) {
+    for (const f of [README, CONNECTOR_README]) {
+      assert.ok(read(f).includes('https://github.com/xns-cloud/relayer-mcp/blob/main/PRIVACY.md'), `${f}: PRIVACY.md link missing`);
+    }
+    assert.ok(read(README).includes('https://github.com/xns-cloud/xns-storage-plugin/blob/main/connector/README.md'), 'plugin README does not link the connector README');
+    const readme = read(CONNECTOR_README);
+    for (const f of [README, SET_UP, CONNECTOR_README]) {
       assert.ok(read(f).includes('https://github.com/xns-cloud/relayer-mcp#troubleshooting'), `${f}: troubleshooting link missing`);
     }
     for (const h of ['auth.xns.tech', 'console.xns.tech', 'releases.xns.tech', 'Docker Hub', '~/.xns/credentials']) {
@@ -242,6 +263,7 @@ describe('listing', () => {
       for (const s of [
         'call no tool', 'skip every step that names a tool', ...COMMANDS, 'set up XNS storage', 'Docker',
         'Node.js 24', 'claude.ai', 'failed to start', 'Node.js is missing', 'Do not repeat the install steps',
+        '`xns-relayer`', 'already installed from the Claude plugin directory',
       ]) {
         assert.ok(body.includes(s), `${f}: section lacks "${s}"`);
       }
@@ -292,8 +314,8 @@ describe('listing', () => {
       assert.ok(text.includes('before calling it ask the user whether that file already holds profiles they want to keep'), `${f}: does not ask before replacing ~/.xns/credentials`);
       assert.ok(text.includes('Call it only when the user says to replace the file; if they want to keep a profile, do not call it.'), `${f}: does not stop when the user keeps a profile`);
       const gated = flat(section(read(f), '## If the XNS tools are not loaded'));
-      assert.ok(gated.indexOf(COMMANDS[0]) > gated.search(/plugin is not installed yet/), `${f}: install steps not gated on the plugin being absent`);
-      assert.ok(/plugin is not installed yet/.test(gated), `${f}: install steps not gated on the plugin being absent`);
+      assert.ok(/connector is not installed yet/.test(gated), `${f}: install steps not gated on the connector being absent`);
+      assert.ok(gated.indexOf(COMMANDS[0]) > gated.search(/connector is not installed yet/), `${f}: install steps not gated on the connector being absent`);
     }
   });
 
@@ -368,11 +390,12 @@ describe('listing', () => {
     }
   });
 
-  test('both marketplace descriptions equal the manifest description', () => {
+  test('marketplace descriptions equal the manifest descriptions', () => {
     const mk = json('.claude-plugin/marketplace.json');
     const d = json(PLUGIN_JSON).description;
     assert.equal(mk.description, d);
     assert.equal(mk.plugins[0].description, d);
+    assert.equal(mk.plugins[1].description, json(CONNECTOR_JSON).description);
   });
 
   const ALLOWED_EXT = /\.(md|txt|json|ya?ml|png|jpe?g|gif|webp|ico)$/i;
@@ -405,10 +428,34 @@ describe('listing', () => {
     assert.ok(section(read(README), '## Security').includes('support@xns.tech'));
   });
 
-  test('marketplace source is ./plugin and the manifest lives there', () => {
-    assert.equal(json('.claude-plugin/marketplace.json').plugins[0].source, './plugin');
+  test('marketplace sources are ./plugin and ./connector and the manifests live there', () => {
+    const [skills, connector] = json('.claude-plugin/marketplace.json').plugins;
+    assert.equal(skills.source, './plugin');
+    assert.equal(connector.source, './connector');
     assert.ok(existsSync(path.join(ROOT, PLUGIN_JSON)), 'plugin/.claude-plugin/plugin.json missing');
+    assert.ok(existsSync(path.join(ROOT, CONNECTOR_JSON)), 'connector/.claude-plugin/plugin.json missing');
     assert.ok(!existsSync(path.join(ROOT, '.claude-plugin/plugin.json')), 'stray root plugin.json');
+  });
+
+  // The directory accepts local code only from organizations it has Verified, so the plugin it
+  // reads (plugin/) carries Markdown, JSON and the icon only. The MCP server lives in connector/.
+  test('plugin/ holds no MCP server, hooks or launcher text', () => {
+    const files = pluginFiles();
+    for (const f of files) {
+      assert.ok(!/(^|\/)(\.mcp\.json|hooks\.json|\.lsp\.json|settings\.json)$/.test(f), `local-code file in plugin/: ${f}`);
+      assert.ok(!/^plugin\/(hooks|bin|commands|agents|mods|monitors|workflows)\//.test(f), `local-code folder in plugin/: ${f}`);
+    }
+    const pj = json(PLUGIN_JSON);
+    for (const k of ['mcpServers', 'hooks', 'lspServers', 'commands', 'agents', 'dependencies', 'userConfig']) {
+      assert.ok(!(k in pj), `plugin.json declares ${k}`);
+    }
+    const entry = json('.claude-plugin/marketplace.json').plugins[0];
+    for (const k of ['mcpServers', 'hooks', 'lspServers', 'commands', 'agents', 'skills']) {
+      assert.ok(!(k in entry), `marketplace entry for plugin/ declares ${k}`);
+    }
+    for (const f of files.filter((x) => /\.(md|json)$/i.test(x))) {
+      assert.ok(!/\b(npx|uvx|bunx)\b/.test(read(f)), `${f}: names a package launcher`);
+    }
   });
 
   test('skill frontmatter has only name and description', () => {

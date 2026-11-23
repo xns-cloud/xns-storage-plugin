@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.4.0] - 2026-11-23
+
+### Changed
+
+- The MCP server moved out of `xns-storage` into a second plugin, `xns-relayer`, in
+  `connector/`. `xns-storage` in `plugin/` now holds only the two skills, the README, the
+  license and the icon. The marketplace lists both plugins; install both.
+- The skills and READMEs give three install commands: add the marketplace, install
+  `xns-storage` (skipped when it came from the Claude plugin directory), install `xns-relayer`.
+- When the XNS tools are missing, the skills name the connector as their source and give the
+  steps to install it.
+- What the MCP server runs, sends and fetches is documented in `connector/README.md`.
+
+### Added
+
+- Tests: `plugin/` holds no MCP server, hooks or launcher text; `connector/` holds exactly one
+  pinned MCP server; both plugins carry the same version.
+
 ## [0.3.1] - 2026-11-23
 
 ### Changed

@@ -7,15 +7,20 @@ account, install the Relayer, link it to your account, let you choose where your
 stored, and confirm that storage works. Your part is four browser steps: sign up, click one
 email link, confirm one claim and sign in to the Relayer dashboard. Claude never sees your password.
 
+This plugin holds the instructions. The tools that do the work come from the XNS Relayer
+connector (`xns-relayer`), a separate plugin that runs on your computer. Install both.
+
 ## Install
 
-In Claude Code, run these two commands in order:
+In Claude Code, run these commands in order:
 
 ```text
 /plugin marketplace add xns-cloud/xns-storage-plugin
 /plugin install xns-storage@xns-cloud
+/plugin install xns-relayer@xns-cloud
 ```
 
+If you installed XNS Storage from the Claude plugin directory, skip the second command.
 Then say: set up XNS storage
 
 In claude.ai chat the XNS tools cannot load, because they run only on a computer. There the
@@ -23,16 +28,19 @@ plugin explains XNS and gives these same steps to run on a computer with Docker 
 in Claude Code or Cowork.
 
 In Cowork (the Claude desktop app), open the Plugins page, add the GitHub marketplace
-`xns-cloud/xns-storage-plugin` and install `xns-storage`.
+`xns-cloud/xns-storage-plugin` and install `xns-storage` and `xns-relayer`.
 
 ## What's inside
 
-- **The XNS Relayer MCP server**
-  ([`@xns-cloud/relayer-mcp`](https://www.npmjs.com/package/@xns-cloud/relayer-mcp), open
-  source, [source code](https://github.com/xns-cloud/relayer-mcp)): 15 tools for install,
-  sign-in, health checks, settings, restarts and configuration backups.
 - **Skill `set-up-xns-storage`**: the onboarding sequence from sign-up to a verified bucket.
 - **Skill `use-xns-storage`**: pointing S3 tools at the Relayer and day-to-day changes.
+
+The connector, in its own plugin: the XNS Relayer MCP server
+([`@xns-cloud/relayer-mcp`](https://www.npmjs.com/package/@xns-cloud/relayer-mcp), open
+source, [source code](https://github.com/xns-cloud/relayer-mcp)), with 15 tools for install,
+sign-in, health checks, settings, restarts and configuration backups. What it runs, sends and
+fetches is listed in its
+[README](https://github.com/xns-cloud/xns-storage-plugin/blob/main/connector/README.md).
 
 ## Requirements
 
@@ -54,46 +62,9 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
 
 ## What this plugin runs, sends and fetches
 
-- **Runs** the MCP server with `npx -y @xns-cloud/relayer-mcp@0.14.1`, which downloads that
-  exact version from the npm registry.
-- **Starts Docker containers** on your machine when you ask Claude to install the Relayer. It
-  writes `docker-compose.yml` and `.env` to the install directory. The release compose pulls
-  eight images:
-  - `releases.xns.tech/xns-relayer`, the Relayer, from `releases.xns.tech`
-  - `releases.xns.tech/relayer-loki`, log storage, from `releases.xns.tech`
-  - `releases.xns.tech/relayer-alloy`, log collection, from `releases.xns.tech`
-  - `releases.xns.tech/relayer-audit-logrotate`, audit log rotation, from `releases.xns.tech`
-  - `releases.xns.tech/relayer-prometheus`, metrics, from `releases.xns.tech`
-  - `releases.xns.tech/relayer-alertmanager`, alerts, from `releases.xns.tech`
-  - `releases.xns.tech/relayer-grafana`, dashboards, from `releases.xns.tech`
-  - `prom/node-exporter`, host metrics, from Docker Hub
-- **Contacts** `auth.xns.tech` for sign-in (in your browser, with PKCE), `console.xns.tech`
-  to claim your Relayer, `releases.xns.tech` to download the compose bundle and images, and
-  Docker Hub for the `prom/node-exporter` image. Reading or changing your Relayer's settings goes
-  to the Relayer itself.
-- **Sends your sign-in token to your Relayer.** `get_host_tags`, `configure_vpd`,
-  `describe_settings`, `update_settings`, `restart_service`, `manage_backups` and
-  `setup_cli_credentials` send it to the Relayer address set in the server,
-  `http://localhost:8888` by default; the caller cannot change the host (`setup_cli_credentials`
-  lets you pick only the port). `verify_storage` sends the server's sign-in only to that same
-  address; a token you pass to it yourself goes to the Relayer address you pass, which must be
-  `localhost`, loopback, a private (RFC 1918) address or `*.local`. `verify_storage` and
-  `setup_cli_credentials` refuse a redirect the Relayer returns; the other tools follow one. Two
-  inputs take any address, and neither gets the token: the host of the health check and the S3
-  endpoint of the storage test. A custom compose file URL for install is taken only from https
-  on `releases.xns.tech`, a `file://` path to a `.yml` or `.yaml` file, or a loopback,
-  private-network or `.local` host.
-- **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. It uses the server's
-  own sign-in (you never pass it a token), creates an S3 key pair named `xns-cli` on your
-  Relayer, and replaces the whole file with a single `default` profile, so any other profile in
-  it is lost. The skills offer it as an optional step once the claim is complete, and first ask
-  you whether that file holds profiles you want to keep; they call it only when you say to
-  replace the file.
-- **Does not** collect telemetry, analytics or crash reports. The default compose download asks
-  for `docker-compose.yml?src=mcp`: `src=mcp` is a fixed source tag, the same for every user
-  and carrying no identifier, used only to count downloads by how they were made. The `.env`
-  download and a compose file URL you pass carry no tag. Sign-in tokens stay in memory
-  and are discarded when the server exits. Your stored objects never pass through the plugin.
+Nothing. This plugin is two skills: text that tells Claude how to set up and use XNS storage.
+It runs no program, starts no server, and sends and fetches nothing. The connector does that
+work; see its README, linked above.
 
 ## Privacy policy
 

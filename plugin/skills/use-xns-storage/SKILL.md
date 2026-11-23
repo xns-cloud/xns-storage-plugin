@@ -15,17 +15,20 @@ If the XNS tools are not available in this conversation, call no tool and skip e
 names a tool (credentials, settings, restarts and backups). Still give the endpoint settings for
 S3 tools from the lines below. Name the cause when you know it:
 
-- In Claude Code with this plugin installed, the MCP server failed to start: run `/mcp` to see
+- The tools come from the XNS Relayer connector (`xns-relayer`), a separate plugin that runs on
+  the computer. This plugin holds only these instructions.
+- In Claude Code with the connector installed, its MCP server failed to start: run `/mcp` to see
   why, and check that `node --version` prints 24 or newer. Do not repeat the install steps.
 - If Node.js is missing, install Node.js 24 first, then restart Claude Code.
 - In claude.ai chat, the tools run only on a computer, so they cannot load here.
 
-If the plugin is not installed yet and the person has no Relayer, say what XNS is and give the steps for a computer with Docker
-and Node.js 24. In Claude Code on that computer, run
-`/plugin marketplace add xns-cloud/xns-storage-plugin`, then
-`/plugin install xns-storage@xns-cloud`. In Cowork, add the GitHub marketplace
-`xns-cloud/xns-storage-plugin` on the Plugins page and install `xns-storage`. Then say "set up XNS
-storage".
+If the connector is not installed yet, give the steps for a computer with Docker and Node.js 24.
+In Claude Code on that computer, run `/plugin marketplace add xns-cloud/xns-storage-plugin`,
+then `/plugin install xns-storage@xns-cloud` (skip this one when `xns-storage` is already
+installed from the Claude plugin directory), then `/plugin install xns-relayer@xns-cloud`. In
+Cowork, add the GitHub marketplace `xns-cloud/xns-storage-plugin` on the Plugins page and install
+`xns-relayer`, and `xns-storage` if it is not installed yet. If the person has no Relayer yet, say
+what XNS is first, and tell them to say "set up XNS storage" once both are installed.
 
 ## Credentials
 
