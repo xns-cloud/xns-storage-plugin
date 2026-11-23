@@ -33,7 +33,7 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
 
 ## What this connector runs, sends and fetches
 
-- **Runs** the MCP server with `npx -y @xns-cloud/relayer-mcp@0.14.1`, which downloads that
+- **Runs** the MCP server with `npx -y @xns-cloud/relayer-mcp@0.14.2`, which downloads that
   exact version from the npm registry.
 - **Starts Docker containers** on your machine when you ask Claude to install the Relayer. It
   writes `docker-compose.yml` and `.env` to the install directory. The release compose pulls
@@ -64,10 +64,11 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
   private-network or `.local` host.
 - **Writes** `~/.xns/credentials` only when `setup_cli_credentials` runs. It uses the server's
   own sign-in (you never pass it a token), creates an S3 key pair named `xns-cli` on your
-  Relayer, and replaces the whole file with a single `default` profile, so any other profile in
-  it is lost. The `xns-storage` skills offer it as an optional step once the claim is complete,
-  and first ask you whether that file holds profiles you want to keep; they call it only when
-  you say to replace the file.
+  Relayer, and adds the keys to the file as one profile. A profile that holds a secret key is never
+  replaced: the new keys go in `default` only when it is absent or holds no secret key, and
+  otherwise in a new profile (`xns-cli`, then `xns-cli-2`). A file that is not an XNS credentials
+  file is left as it is. The `xns-storage` skills offer it as an optional step once the claim is
+  complete.
 - **Does not** collect telemetry, analytics or crash reports. The default compose download asks
   for `docker-compose.yml?src=mcp`: `src=mcp` is a fixed source tag, the same for every user
   and carrying no identifier, used only to count downloads by how they were made. The `.env`

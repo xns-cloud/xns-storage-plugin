@@ -27,7 +27,7 @@ const TOOLS = [
 const EXEMPT = ['ui_port', 's3_port', 'dry_run', 'require_restart', 'endpoint_url', 'compose_url'];
 const PLUGIN_JSON = 'plugin/.claude-plugin/plugin.json';
 const README = 'plugin/README.md';
-const RELAYER_MCP_VERSION = '0.14.1';
+const RELAYER_MCP_VERSION = '0.14.2';
 const CONNECTOR_JSON = 'connector/.claude-plugin/plugin.json';
 const CONNECTOR_README = 'connector/README.md';
 const MCP = 'connector/.mcp.json';
@@ -233,11 +233,11 @@ describe('listing', () => {
       '`verify_storage` sends the server\'s sign-in only to that same address',
       'a token you pass to it yourself goes to the Relayer address you pass, which must be',
       '`verify_storage` and `setup_cli_credentials` refuse a redirect the Relayer returns; the other tools follow one',
-      'first ask you whether that file holds profiles you want to keep; they call it only when you say to replace the file',
       'Two inputs take any address, and neither gets the token',
       'A custom compose file URL for install is taken only from https on `releases.xns.tech`',
       'only when `setup_cli_credentials` runs. It uses the server\'s own sign-in',
-      'replaces the whole file with a single `default` profile',
+      'adds the keys to the file as one profile. A profile that holds a secret key is never replaced',
+      'A file that is not an XNS credentials file is left as it is',
       '`docker-compose.yml?src=mcp`',
       'carrying no identifier',
       '**Does not** collect telemetry, analytics or crash reports',
@@ -317,8 +317,10 @@ describe('listing', () => {
       }
       assert.ok(!text.includes('no tool hands back'), `${f}: keeps the "no tool hands back" line`);
       assert.ok(naming.some((s) => s.includes("the server's own sign-in")), `${f}: does not say setup_cli_credentials uses the server's own sign-in`);
-      assert.ok(text.includes('before calling it ask the user whether that file already holds profiles they want to keep'), `${f}: does not ask before replacing ~/.xns/credentials`);
-      assert.ok(text.includes('Call it only when the user says to replace the file; if they want to keep a profile, do not call it.'), `${f}: does not stop when the user keeps a profile`);
+      // relayer-mcp 0.14.2 keeps every profile that holds keys.
+      assert.ok(text.includes('Profiles that hold keys are kept: when `default` already holds keys, the new ones go in a new profile.'), `${f}: does not say profiles are kept`);
+      assert.ok(text.includes('Give the user the `xns` command from the reply.'), `${f}: does not pass on the xns command`);
+      assert.ok(!/replaces `~\/\.xns\/credentials`|replace the file/.test(text), `${f}: still says the file is replaced`);
       const gated = flat(section(read(f), '## If the XNS tools are not loaded'));
       assert.ok(/connector is not installed yet/.test(gated), `${f}: install steps not gated on the connector being absent`);
       assert.ok(gated.indexOf(COMMANDS[0]) > gated.search(/connector is not installed yet/), `${f}: install steps not gated on the connector being absent`);

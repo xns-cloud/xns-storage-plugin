@@ -38,11 +38,10 @@ what XNS is first, and tell them to say "set up XNS storage" once both are insta
 - The user creates S3 keys in the dashboard, including a **Backup** key type made for immutable
   backups. Use that key pair in other S3 tools.
 - Optional, for the XNS command line: once `check_claim_status` reaches STATE_3,
-  `setup_cli_credentials` makes an S3 key pair with the server's own sign-in and writes
-  `~/.xns/credentials`. It never takes a pasted token. It replaces `~/.xns/credentials` with one
-  profile, so before calling it ask the user whether that file already holds
-  profiles they want to keep. Call it only when the user says to replace the file; if they
-  want to keep a profile, do not call it. Never ask the user to
+  `setup_cli_credentials` makes an S3 key pair with the server's own sign-in and adds it to
+  `~/.xns/credentials`. It never takes a pasted token. Profiles that hold keys are kept: when
+  `default` already holds keys, the new ones go in a new profile. Give the user the `xns` command
+  from the reply. Never ask the user to
   paste a sign-in token.
 - Never print a secret key back into the conversation unless the user asks for it.
 
