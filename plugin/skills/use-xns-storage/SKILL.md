@@ -31,8 +31,10 @@ storage".
 
 - The user creates S3 keys in the dashboard, including a **Backup** key type made for immutable
   backups. Use that key pair in other S3 tools.
-- Do not call `setup_cli_credentials`: it needs the user's sign-in token, which no tool hands
-  back. Never ask the user to paste a sign-in token.
+- Optional, for the XNS command line: once `check_claim_status` reaches STATE_3,
+  `setup_cli_credentials` makes an S3 key pair with the server's own sign-in and writes
+  `~/.xns/credentials`. It never takes a pasted token. Never ask the user to paste a sign-in
+  token.
 - Never print a secret key back into the conversation unless the user asks for it.
 
 ## Pointing common tools at it

@@ -27,6 +27,7 @@ const TOOLS = [
 const EXEMPT = ['ui_port', 's3_port', 'dry_run', 'require_restart', 'endpoint_url', 'compose_url'];
 const PLUGIN_JSON = 'plugin/.claude-plugin/plugin.json';
 const README = 'plugin/README.md';
+const RELAYER_MCP_VERSION = '0.14.1';
 const COMMANDS = ['/plugin marketplace add xns-cloud/xns-storage-plugin', '/plugin install xns-storage@xns-cloud'];
 
 const extraFiles = () =>
@@ -108,13 +109,15 @@ describe('listing', () => {
     assert.equal(srv.args[0], '-y');
     const m = /^@xns-cloud\/relayer-mcp@(\d+\.\d+\.\d+)$/.exec(srv.args[1]);
     assert.ok(m, `pin must be three plain numbers: ${srv.args[1]}`);
+    // The relayer-mcp release this plugin version ships with.
+    assert.equal(m[1], RELAYER_MCP_VERSION);
     const readme = read(README);
     const found = [...readme.matchAll(/npx -y @xns-cloud\/relayer-mcp@(\S+?)`/g)].map((x) => x[1]);
     assert.ok(found.length >= 1);
     for (const v of found) assert.equal(v, m[1]);
-    assert.equal(json(PLUGIN_JSON).version, '0.3.0');
+    assert.equal(json(PLUGIN_JSON).version, '0.3.1');
     const heading = read('CHANGELOG.md').split('\n').find((l) => l.startsWith('## ['));
-    assert.ok(heading.startsWith('## [0.3.0]'), heading);
+    assert.ok(heading.startsWith('## [0.3.1]'), heading);
   });
 
   test('every dollar amount sits inside the whole price line', () => {
@@ -265,10 +268,15 @@ describe('listing', () => {
     for (const f of SKILLS) {
       const text = flat(read(f));
       assert.ok(text.includes('Never ask the user to paste a sign-in token.'), `${f}: no token guard`);
-      // The only sentence that names the tool is the one that forbids calling it.
+      // setup_cli_credentials signs in on its own, so no sentence may say it needs the user's token.
       const naming = sentences(text).filter((s) => s.includes('setup_cli_credentials'));
-      assert.ok(naming.length >= 1, `${f}: no "Do not call" sentence`);
-      for (const s of naming) assert.ok(s.startsWith('Do not call `setup_cli_credentials`') || s.startsWith('- Do not call `setup_cli_credentials`'), `${f}: names setup_cli_credentials outside the guard: ${s}`);
+      assert.ok(naming.length >= 1, `${f}: setup_cli_credentials not described`);
+      for (const s of naming) {
+        assert.ok(!/do not call/i.test(s), `${f}: still forbids setup_cli_credentials: ${s}`);
+        assert.ok(!/needs the user's sign-in token/.test(s), `${f}: says setup_cli_credentials needs the user's token: ${s}`);
+      }
+      assert.ok(!text.includes('no tool hands back'), `${f}: keeps the "no tool hands back" line`);
+      assert.ok(naming.some((s) => s.includes("the server's own sign-in")), `${f}: does not say setup_cli_credentials uses the server's own sign-in`);
       const gated = flat(section(read(f), '## If the XNS tools are not loaded'));
       assert.ok(gated.indexOf(COMMANDS[0]) > gated.search(/plugin is not installed yet/), `${f}: install steps not gated on the plugin being absent`);
       assert.ok(/plugin is not installed yet/.test(gated), `${f}: install steps not gated on the plugin being absent`);

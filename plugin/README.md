@@ -54,7 +54,7 @@ In Cowork (the Claude desktop app), open the Plugins page, add the GitHub market
 
 ## What this plugin runs, sends and fetches
 
-- **Runs** the MCP server with `npx -y @xns-cloud/relayer-mcp@0.13.0`, which downloads that
+- **Runs** the MCP server with `npx -y @xns-cloud/relayer-mcp@0.14.1`, which downloads that
   exact version from the npm registry.
 - **Starts Docker containers** on your machine when you ask Claude to install the Relayer. It
   writes `docker-compose.yml` and `.env` to the install directory. The release compose pulls
