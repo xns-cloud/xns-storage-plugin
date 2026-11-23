@@ -75,7 +75,7 @@ describe('live', () => {
     urls.add('https://github.com/xns-cloud/relayer-mcp#troubleshooting');
     urls.add('https://github.com/xns-cloud/relayer-mcp/blob/main/PRIVACY.md');
     for (const url of urls) {
-      // xns.tech limits automated clients: one request at a time, at least 3 seconds apart.
+      // Space out requests to xns.tech.
       if (new URL(url).hostname === 'xns.tech') await new Promise((r) => setTimeout(r, 3000));
       const res = await fetch(url, { redirect: 'manual' });
       assert.equal(res.status, 200, `${url} answered ${res.status}`);

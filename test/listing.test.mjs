@@ -172,12 +172,16 @@ describe('listing', () => {
     }
   });
 
-  test('listing links in the manifest', () => {
-    const pj = json(PLUGIN_JSON);
-    assert.equal(pj.documentationUrl, 'https://github.com/xns-cloud/xns-storage-plugin/blob/main/plugin/README.md');
-    assert.equal(pj.supportUrl, 'https://github.com/xns-cloud/xns-storage-plugin/issues');
-    assert.equal(pj.privacyPolicyUrl, 'https://xns.tech/privacy-policy');
-    assert.equal(pj.termsOfServiceUrl, 'https://xns.tech/tos');
+  test('listing links in both manifests', () => {
+    for (const [file, folder] of [[PLUGIN_JSON, 'plugin'], [CONNECTOR_JSON, 'connector']]) {
+      const pj = json(file);
+      assert.equal(pj.documentationUrl, `https://github.com/xns-cloud/xns-storage-plugin/blob/main/${folder}/README.md`, file);
+      assert.equal(pj.supportUrl, 'https://github.com/xns-cloud/xns-storage-plugin/issues', file);
+      assert.equal(pj.privacyPolicyUrl, 'https://xns.tech/privacy-policy', file);
+      assert.equal(pj.termsOfServiceUrl, 'https://xns.tech/tos', file);
+      const icon = 'connector' === folder ? `connector/${pj.icon.replace(/^\.\//, '')}` : null;
+      if (icon) git('ls-files', '--error-unmatch', '--', icon);
+    }
   });
 
   test('icon file: tracked, PNG or JPEG, square, 512 to 2048 px, under 2 MB', () => {
@@ -453,7 +457,7 @@ describe('listing', () => {
     for (const k of ['mcpServers', 'hooks', 'lspServers', 'commands', 'agents', 'skills']) {
       assert.ok(!(k in entry), `marketplace entry for plugin/ declares ${k}`);
     }
-    for (const f of files.filter((x) => /\.(md|json)$/i.test(x))) {
+    for (const f of files.filter((x) => !/\.(png|jpe?g|gif|webp|ico)$/i.test(x))) {
       assert.ok(!/\b(npx|uvx|bunx)\b/.test(read(f)), `${f}: names a package launcher`);
     }
   });

@@ -16,8 +16,10 @@ names a tool (credentials, settings, restarts and backups). Still give the endpo
 S3 tools from the lines below. Name the cause when you know it:
 
 - The tools come from the XNS Relayer connector (`xns-relayer`), a separate plugin that runs on
-  the computer. This plugin holds only these instructions.
-- In Claude Code with the connector installed, its MCP server failed to start: run `/mcp` to see
+  the computer. This plugin holds only these instructions. When `/mcp` lists no `xns-relayer`
+  server, the connector is not installed: give the install steps below.
+- In Claude Code with the connector installed (`/mcp` lists `xns-relayer`), its MCP server
+  failed to start: run `/mcp` to see
   why, and check that `node --version` prints 24 or newer. Do not repeat the install steps.
 - If Node.js is missing, install Node.js 24 first, then restart Claude Code.
 - In claude.ai chat, the tools run only on a computer, so they cannot load here.

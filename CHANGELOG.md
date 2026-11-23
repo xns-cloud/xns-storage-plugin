@@ -12,6 +12,9 @@
 - When the XNS tools are missing, the skills name the connector as their source and give the
   steps to install it.
 - What the MCP server runs, sends and fetches is documented in `connector/README.md`.
+- Upgrading from 0.3.x: after `xns-storage` updates, the XNS tools are gone until
+  `xns-relayer` is installed. They then load under the new plugin's name, so tool permissions
+  saved for the old names have to be granted again.
 
 ### Added
 
